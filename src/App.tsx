@@ -10,6 +10,7 @@ function App(): JSX.Element {
     return (
       <LiveClockScreen
         state={engine.liveState}
+        nowMs={engine.nowMs}
         onPauseToggle={engine.pauseToggle}
         onNextLevel={engine.nextLevel}
         onPrevLevel={engine.prevLevel}
