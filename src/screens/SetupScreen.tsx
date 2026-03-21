@@ -5,6 +5,7 @@ import { formatCurrencyGBP, formatDuration, formatNumber } from '../lib/format';
 import { BlindPresetKey, TournamentSetup } from '../types/tournament';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { NumericStepper } from '../components/NumericStepper';
 
 interface Props {
   setup: TournamentSetup;
@@ -52,19 +53,43 @@ export function SetupScreen({ setup, onChange, onStart }: Props): JSX.Element {
 
       <Card>
         <h2 className="mb-3 text-base font-semibold text-white">Tournament Setup</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="text-sm">Players
-            <input type="number" min={2} max={10} value={setup.players} onChange={(e) => update('players', Math.min(10, Math.max(2, numeric(e, 6))))} className="mt-1 w-full rounded-lg border border-borderTone bg-bgSecondary p-2" />
-          </label>
-          <label className="text-sm">Starting Stack
-            <input type="number" min={100} value={setup.startingStack} onChange={(e) => update('startingStack', Math.max(100, numeric(e, 3000)))} className="mt-1 w-full rounded-lg border border-borderTone bg-bgSecondary p-2" />
-          </label>
-          <label className="text-sm">Buy-in (GBP)
-            <input type="number" min={1} value={setup.buyIn} onChange={(e) => update('buyIn', Math.max(1, numeric(e, 10)))} className="mt-1 w-full rounded-lg border border-borderTone bg-bgSecondary p-2" />
-          </label>
-          <label className="text-sm">Rebuy Window (min)
-            <input type="number" min={0} value={setup.rebuyWindowMinutes} onChange={(e) => update('rebuyWindowMinutes', Math.max(0, numeric(e, preset.defaultRebuyWindowMinutes)))} className="mt-1 w-full rounded-lg border border-borderTone bg-bgSecondary p-2" />
-          </label>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <NumericStepper
+            label="Players"
+            value={setup.players}
+            onChange={(value) => update('players', value)}
+            min={2}
+            max={10}
+            step={1}
+            helperText="2-10"
+          />
+          <NumericStepper
+            label="Starting Stack"
+            value={setup.startingStack}
+            onChange={(value) => update('startingStack', value)}
+            min={1000}
+            max={20000}
+            step={500}
+            unit="chips"
+          />
+          <NumericStepper
+            label="Buy-in"
+            value={setup.buyIn}
+            onChange={(value) => update('buyIn', value)}
+            min={5}
+            max={500}
+            step={5}
+            unit="£"
+          />
+          <NumericStepper
+            label="Rebuy Window"
+            value={setup.rebuyWindowMinutes}
+            onChange={(value) => update('rebuyWindowMinutes', value)}
+            min={0}
+            max={240}
+            step={5}
+            unit="mins"
+          />
         </div>
 
         <div className="mt-3 flex items-center justify-between rounded-lg border border-borderTone bg-bgSecondary p-3">
@@ -93,9 +118,9 @@ export function SetupScreen({ setup, onChange, onStart }: Props): JSX.Element {
           {setup.levels.map((level, index) => (
             <div key={`${index}-${level.smallBlind}-${level.bigBlind}`} className="grid grid-cols-12 gap-2 rounded-xl border border-borderTone bg-bgSecondary p-2">
               <div className="col-span-2 text-xs text-muted">L{index + 1}</div>
-              <input className="col-span-3 rounded bg-bg p-2 text-sm" type="number" value={level.smallBlind} onChange={(e) => updateLevel(index, 'smallBlind', Math.max(1, numeric(e, level.smallBlind)))} />
-              <input className="col-span-3 rounded bg-bg p-2 text-sm" type="number" value={level.bigBlind} onChange={(e) => updateLevel(index, 'bigBlind', Math.max(1, numeric(e, level.bigBlind)))} />
-              <input className="col-span-3 rounded bg-bg p-2 text-sm" type="number" value={level.durationMinutes} onChange={(e) => updateLevel(index, 'durationMinutes', Math.max(1, numeric(e, level.durationMinutes)))} />
+              <input className="col-span-3 rounded bg-bg p-2 text-sm" type="number" inputMode="numeric" value={level.smallBlind} onChange={(e) => updateLevel(index, 'smallBlind', Math.max(1, numeric(e, level.smallBlind)))} />
+              <input className="col-span-3 rounded bg-bg p-2 text-sm" type="number" inputMode="numeric" value={level.bigBlind} onChange={(e) => updateLevel(index, 'bigBlind', Math.max(1, numeric(e, level.bigBlind)))} />
+              <input className="col-span-3 rounded bg-bg p-2 text-sm" type="number" inputMode="numeric" value={level.durationMinutes} onChange={(e) => updateLevel(index, 'durationMinutes', Math.max(1, numeric(e, level.durationMinutes)))} />
               <button className="col-span-1 text-danger" onClick={() => removeLevel(index)} aria-label={`Remove level ${index + 1}`}>✕</button>
             </div>
           ))}
