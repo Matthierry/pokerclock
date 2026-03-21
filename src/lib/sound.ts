@@ -1,20 +1,44 @@
 let audioCtx: AudioContext | null = null;
 
-export function playLevelUpAlert(): void {
-  if (typeof window === 'undefined') return;
+function getAudioContext(): AudioContext | null {
+  if (typeof window === 'undefined') return null;
   audioCtx = audioCtx ?? new AudioContext();
-  const now = audioCtx.currentTime;
+  return audioCtx;
+}
 
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(784, now);
-  osc.frequency.exponentialRampToValueAtTime(1046, now + 0.18);
-  gain.gain.setValueAtTime(0.001, now);
-  gain.gain.exponentialRampToValueAtTime(0.2, now + 0.03);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start(now);
-  osc.stop(now + 0.25);
+export function primeLevelUpAudio(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') {
+    void ctx.resume().catch(() => {});
+  }
+}
+
+export function playLevelUpAlert(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const start = () => {
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(1100, now + 0.18);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.2, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.24);
+  };
+
+  if (ctx.state === 'suspended') {
+    void ctx.resume().then(start).catch(() => {});
+    return;
+  }
+  start();
 }

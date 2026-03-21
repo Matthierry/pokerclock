@@ -9,6 +9,7 @@ import { LiveTournamentState } from '../types/tournament';
 
 interface Props {
   state: LiveTournamentState;
+  nowMs: number;
   onPauseToggle: () => void;
   onNextLevel: () => void;
   onPrevLevel: () => void;
@@ -17,10 +18,10 @@ interface Props {
   onToggleSound: () => void;
 }
 
-export function LiveClockScreen({ state, onPauseToggle, onNextLevel, onPrevLevel, onPlayerOut, onPlayerRebuy, onToggleSound }: Props): JSX.Element {
+export function LiveClockScreen({ state, nowMs, onPauseToggle, onNextLevel, onPrevLevel, onPlayerOut, onPlayerRebuy, onToggleSound }: Props): JSX.Element {
   const [confirmOut, setConfirmOut] = useState(false);
   const [confirmRebuy, setConfirmRebuy] = useState(false);
-  const timeline = useMemo(() => getTimeline(state), [state]);
+  const timeline = useMemo(() => getTimeline(state, nowMs), [state, nowMs]);
   const current = state.setup.levels[timeline.levelIndex];
   const next = state.setup.levels[timeline.levelIndex + 1] ?? null;
   const prizePool = calcCurrentPrizePool(state);
@@ -39,7 +40,7 @@ export function LiveClockScreen({ state, onPauseToggle, onNextLevel, onPrevLevel
       <Card className="text-center">
         <div className="text-xs uppercase tracking-wide text-muted">Level {timeline.levelIndex + 1}</div>
         <div className="mt-1 text-4xl font-bold text-white">{formatNumber(current.smallBlind)} / {formatNumber(current.bigBlind)}</div>
-        <div className="mt-3 font-mono text-6xl font-bold text-accent">{formatSeconds(timeline.levelRemainingSeconds)}</div>
+        <div className={`mt-3 font-mono text-6xl font-bold ${timeline.levelRemainingSeconds <= 10 ? 'text-warning' : 'text-accent'}`}>{formatSeconds(timeline.levelRemainingSeconds)}</div>
         <div className="mt-2 text-sm text-muted">Next: {next ? `${formatNumber(next.smallBlind)} / ${formatNumber(next.bigBlind)}` : 'Final level loop'}</div>
       </Card>
 

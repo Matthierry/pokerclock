@@ -19,8 +19,10 @@ export interface TournamentSetup {
 export interface LiveTournamentState {
   setup: TournamentSetup;
   startedAt: number;
-  elapsedMsBeforePause: number;
-  lastResumedAt: number | null;
+  levelStartTimestamp: number;
+  levelStartElapsedMsTotal: number;
+  pausedAtTimestamp: number | null;
+  accumulatedPausedMs: number;
   paused: boolean;
   currentLevelIndex: number;
   playersRemaining: number;
